@@ -91,6 +91,7 @@ let state = {
   endHour: 22,
   rowDuration: 30,
   timeInterval: 1,
+  rowHeightScale: 1.0,
   headerPos: "top",
   direction: "normal",
   colColors: Array(9).fill("transparent"),
@@ -166,7 +167,7 @@ function setupDefaults() {
       id: "c-vamp",
       row: morningStart + rowsPerHour,
       col: 2,
-      span: Math.max(1, rowsPerHour),
+      span: Math.max(1, Math.floor(rowsPerHour / 2)),
       title: "Vampire hunting",
       bullets: "Crucifix ready",
       bgColor: "#fff0f0",
@@ -276,6 +277,12 @@ function init() {
     state.timeInterval = parseInt(e.target.value);
     render();
   });
+  document
+    .getElementById("row-height-scale")
+    .addEventListener("change", (e) => {
+      state.rowHeightScale = parseInt(e.target.value) / 100;
+      render();
+    });
   document.getElementById("header-pos").addEventListener("change", (e) => {
     state.headerPos = e.target.value;
     render();
@@ -353,6 +360,7 @@ function saveState() {
       endHour: state.endHour,
       rowDuration: state.rowDuration,
       timeInterval: state.timeInterval,
+      rowHeightScale: state.rowHeightScale,
       headerPos: state.headerPos,
       direction: state.direction,
       colColors: state.colColors,
@@ -398,11 +406,23 @@ function loadState() {
     state.endHour = s.endHour ?? state.endHour;
     state.rowDuration = s.rowDuration ?? state.rowDuration;
     state.timeInterval = s.timeInterval ?? state.timeInterval;
+    state.rowHeightScale = s.rowHeightScale ?? state.rowHeightScale;
     state.headerPos = s.headerPos ?? state.headerPos;
     state.direction = s.direction ?? state.direction;
     state.colColors = s.colColors ?? state.colColors;
     state.cards = s.cards ?? state.cards;
     state.sections = s.sections ?? state.sections;
+
+    // Update UI inputs to match loaded state
+    if ($("start-hour")) $("start-hour").value = state.startHour;
+    if ($("end-hour")) $("end-hour").value = state.endHour;
+    if ($("row-duration")) $("row-duration").value = state.rowDuration;
+    if ($("time-interval")) $("time-interval").value = state.timeInterval;
+    if ($("row-height-scale"))
+      $("row-height-scale").value = Math.round(state.rowHeightScale * 100);
+    if ($("header-pos")) $("header-pos").value = state.headerPos;
+    if ($("table-dir")) $("table-dir").value = state.direction;
+
     return true;
   } catch (e) {
     console.warn("load failed", e);
@@ -627,10 +647,11 @@ function render() {
   const rowCount = Math.ceil(totalMins / state.rowDuration);
 
   // compute min heights
-  const computedMinH = Math.min(
+  let computedMinH = Math.min(
     64,
-    Math.max(14, Math.round(14 + 12 * (30 / state.rowDuration))),
+    Math.max(10, Math.round(10 + 8 * (30 / state.rowDuration))),
   );
+  computedMinH = Math.round(computedMinH * (state.rowHeightScale || 1.0));
   const minH = computedMinH;
   const rowHeights = new Array(rowCount).fill(minH);
   const measurer = document.getElementById("measurer");
@@ -804,11 +825,12 @@ function render() {
             <div class="drag-bar"></div>
             <div class="resize-handle-top"></div>
             <div class="card-header" style="background:${cardObj.headerColor}">
-                <div class="card-times"><span>${formatTime(state.startHour, cardObj.row * state.rowDuration)}</span><span>${formatTime(state.startHour, (cardObj.row + cardObj.span) * state.rowDuration)}</span></div>
+                <div class="card-times"><span>${formatTime(state.startHour, cardObj.row * state.rowDuration)}</span> <span>${formatTime(state.startHour, (cardObj.row + cardObj.span) * state.rowDuration)}</span></div>
                 <div class="card-title" contenteditable="true" spellcheck="false">${cardObj.title}</div>
                 <div class="flex flex-row gap-1 no-export items-center"><div class="color-picker-box bg-btn" style="background:${cardObj.bgColor}"></div><div class="color-picker-box header-btn" style="background:${cardObj.headerColor}"></div></div>
             </div>
             <div class="card-body"><div class="bullet-list" contenteditable="true" spellcheck="false">${cardObj.bullets}</div></div>
+            <button class="card-duplicate no-export" title="Duplicate">⧉</button>
             <button class="card-delete no-export" title="Delete">×</button>
             <div class="resize-handle"></div>
         `;
@@ -841,6 +863,21 @@ function render() {
         }
       };
 
+    const duplicateBtn = cardEl.querySelector(".card-duplicate");
+    if (duplicateBtn)
+      duplicateBtn.onclick = (ev) => {
+        ev.stopPropagation();
+        const newCard = {
+          ...cardObj,
+          id: Date.now().toString(),
+          row: cardObj.row + 1, // shift slightly to show it was created
+        };
+        state.cards.push(newCard);
+        state.selectedCard = newCard.id;
+        scheduleSave();
+        render();
+      };
+
     cardTitle.oninput = (e) => {
       cardObj.title = e.target.innerText;
       state.editing = {
@@ -857,7 +894,7 @@ function render() {
       cardObj.title = e.target.innerText;
       state.editing = null;
       scheduleSave();
-      render();
+      // removed render() to prevent choppy focus/keyboard loss
     };
     bulletList.oninput = (e) => {
       cardObj.bullets = bulletList.innerText;
@@ -882,7 +919,7 @@ function render() {
     bulletList.onblur = () => {
       state.editing = null;
       scheduleSave();
-      render();
+      // removed render() to prevent choppy focus/keyboard loss
     };
 
     cardEl.onclick = (ev) => {
@@ -1317,6 +1354,7 @@ function resetTool() {
     state.endHour = 22;
     state.rowDuration = 30;
     state.timeInterval = 1;
+    state.rowHeightScale = 1.0;
     state.headerPos = "top";
     state.direction = "normal";
     state.colColors = Array(9).fill("transparent");
@@ -1349,6 +1387,8 @@ function resetTool() {
     if ($("end-hour")) $("end-hour").value = state.endHour;
     if ($("row-duration")) $("row-duration").value = state.rowDuration;
     if ($("time-interval")) $("time-interval").value = state.timeInterval;
+    if ($("row-height-scale"))
+      $("row-height-scale").value = Math.round(state.rowHeightScale * 100);
     if ($("header-pos")) $("header-pos").value = state.headerPos;
     if ($("table-dir")) $("table-dir").value = state.direction;
 
