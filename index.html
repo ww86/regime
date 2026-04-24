@@ -11,16 +11,23 @@
             --font-size-card-title: 11px; --font-family-card-title: 'Segoe UI', sans-serif;
             --font-size-section-title: 11px; --font-family-section-title: 'Segoe UI', sans-serif;
             --font-size-bullets: 10px; --font-family-bullets: 'Segoe UI', sans-serif;
-            --font-size-timestamps: 8px; --font-family-timestamps: 'Segoe UI', sans-serif;
+            --font-size-timestamps: 10px; --font-family-timestamps: 'Segoe UI', sans-serif;
             --font-size-header: 11px; --font-family-header: 'Segoe UI', sans-serif;
             --font-size-time-col: 10px; --font-family-time-col: 'Segoe UI', sans-serif;
+            /* default font colors (typography controls will modify these) */
+            --font-color-card-title: #111111;
+            --font-color-section-title: #111111;
+            --font-color-bullets: #333333;
+            --font-color-timestamps: #424242;
+            --font-color-header: #111111;
+            --font-color-time-col: #555555;
         }
 
         body { background-color: #ffffff; margin: 0; overflow-x: hidden; font-family: 'Segoe UI', sans-serif; -webkit-user-select: none; user-select: none; color: #333; }
 
         /* Settings Header */
         .settings-header {
-            background: #fcfcfc; border-bottom: 1px solid #eee; padding: 4px 10px;
+            background: #fcfcfc; padding: 4px 10px;
             display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 10px;
             position: sticky; top: 0; z-index: 1000;
         }
@@ -29,7 +36,7 @@
         }
 
         /* Grid Layout */
-        .regime-container { width: 100%; background: white; position: relative; min-height: 100vh; }
+        .regime-container { width: 100%; background: white; position: relative; min-height: calc(100vh - 56px); }
         .regime-grid { 
             display: grid; 
             width: 100%; 
@@ -40,13 +47,13 @@
 
         /* Elements */
         .cell { position: relative; border: none; min-height: 14px; }
-        .cell.time-cell { border-right: 1px solid #f5f5f5; text-align: right; padding-right: 8px; color: #bbb; line-height: 1.2; display: flex; align-items: flex-start; justify-content: flex-end; }
+        .cell.time-cell { border-right: 1px solid #f5f5f5; text-align: right; padding-right: 8px; color: var(--font-color-time-col); line-height: 1.2; display: flex; align-items: flex-start; justify-content: flex-end; }
 
         .header-cell {
             background: white; font-weight: bold; text-align: center; padding: 6px 2px;
             cursor: pointer; font-size: var(--font-size-header); font-family: var(--font-family-header);
-            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #f0f0f0;
-            text-transform: uppercase; letter-spacing: 0.05em;
+            position: sticky; top: 0; z-index: 100; border-bottom: none;
+            text-transform: uppercase; letter-spacing: 0.05em; color: var(--font-color-header);
         }
 
         /* Activity Cards */
@@ -58,8 +65,8 @@
             z-index: 20; display: flex; flex-direction: column;
             border-radius: 3px; background: white; margin: 1px 2px 0 2px; 
             overflow: visible; position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+            border: none; /* cards should not have an outer border; visual separation provided by drag bar */
             height: calc(100% - 1px);
         }
 
@@ -67,48 +74,60 @@
         .drag-bar:hover { background: rgba(0,0,0,0.1); }
         .drag-bar:active { cursor: grabbing; }
 
-        .card-header { display: flex; align-items: flex-start; padding: 2px 4px; gap: 4px; border-bottom: 1px solid rgba(0,0,0,0.03); }
+        .card-header { display: flex; align-items: center; padding: 1px 4px; gap: 6px; border-bottom: none; }
         .card-times {
-            display: flex; flex-direction: column; width: 30px; flex-shrink: 0;
+            display: flex; flex-direction: row; gap: 6px; width: auto; min-width: 56px; flex-shrink: 0;
+            justify-content: flex-start; align-items: center;
             font-size: var(--font-size-timestamps); font-family: var(--font-family-timestamps);
-            color: #777; line-height: 1; font-weight: bold;
+            color: var(--font-color-timestamps); line-height: 1; font-weight: 700;
         }
         .card-title {
             flex-grow: 1; font-size: var(--font-size-card-title); font-family: var(--font-family-card-title);
-            font-weight: 700; outline: none; line-height: 1.1;
+            font-weight: 700; outline: none; line-height: 1.1; color: var(--font-color-card-title);
         }
 
-        .card-body { padding: 2px 4px; flex-grow: 1; min-height: 10px; }
+        .card-body { padding: 2px 4px; display: flex; flex-direction: column; align-items: stretch; flex: 1 1 auto; min-height: 0; }
+        .card-selected { outline: 2px solid rgba(0,0,0,0.08); }
         .bullet-list {
             list-style: none; padding: 0; margin: 0;
             font-size: var(--font-size-bullets); font-family: var(--font-family-bullets);
-            outline: none; line-height: 1.2; white-space: pre-wrap; color: #444;
-            min-height: 1em;
+            outline: none; line-height: 1.2; white-space: pre-wrap; color: var(--font-color-bullets);
+            min-height: 0; flex: 0 1 auto;
+        }
+        .bullet-list.empty::before {
+            content: '\00a0'; display: block; min-height: 1em;
         }
 
         /* Section Breaks */
         .section-break {
             grid-column: 1 / -1;
             grid-row-start: var(--row-start);
-            height: 1px; background: #000; z-index: 30;
-            position: relative; pointer-events: none; margin-top: -0.5px;
+            height: 2px; background: transparent; z-index: 30;
+            position: relative; pointer-events: auto; margin-top: -1px;
+        }
+        .section-break .section-line {
+            position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #000; z-index: 2050; pointer-events: none;
         }
         .section-label {
-            position: absolute; left: 60px; top: 0; transform: translateY(-50%);
-            background: white; padding: 0px 4px; display: flex; align-items: center;
+            position: absolute; left: 60px; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.95); padding: 4px 8px; display: flex; align-items: center;
             font-size: var(--font-size-section-title); font-family: var(--font-family-section-title);
             font-weight: bold; pointer-events: auto;
-            color: #000; text-transform: uppercase;
+            color: var(--font-color-section-title); text-transform: uppercase; border-radius: 3px; cursor: grab; z-index: 2100;
         }
+        .section-label.section-empty { background: transparent; padding: 0 4px; }
+        .section-label.section-empty .section-input { background: transparent; border-bottom: 1px dashed rgba(0,0,0,0.15); padding: 2px 4px; }
+        .section-label:active { cursor: grabbing; }
         .section-input { border: none; outline: none; background: transparent; text-align: left; min-width: 10px; }
-        .section-delete { margin-left: 6px; cursor: pointer; opacity: 0.3; }
+        .section-delete { margin-left: 6px; cursor: pointer; opacity: 0.3; display: none; }
+        .section-label.selected .section-delete { display: inline-block; }
         .section-delete:hover { opacity: 1; color: red; }
 
         /* Interaction Controls */
         .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 6px; cursor: ns-resize; z-index: 40; }
         .resize-handle-top { position: absolute; top: 0; left: 0; right: 0; height: 10px; cursor: ns-resize; z-index: 40; }
 
-        .color-picker-box { width: 10px; height: 10px; border: 1px solid #999; cursor: pointer; flex-shrink: 0; }
+        .color-picker-box { width: 12px; height: 12px; border: 1px solid rgba(0,0,0,0.25); cursor: pointer; flex-shrink: 0; border-radius: 2px; }
         
         /* Floating Menus */
         .floating-menu {
@@ -127,9 +146,9 @@
 
     <div class="settings-header no-export">
         <div class="flex items-center gap-1 border-r pr-2">
-            Time: <input type="number" id="start-hour" value="6" class="w-8"> - <input type="number" id="end-hour" value="22" class="w-8">
-            Row: <input type="number" id="row-duration" value="15" class="w-10">m
-            Interval: <input type="number" id="time-interval" value="4" class="w-8">
+            Time: <input type="number" id="start-hour" value="6" style="width:44px"> - <input type="number" id="end-hour" value="22" style="width:44px">
+            Row: <input type="number" id="row-duration" value="30" style="width:56px">m
+            Interval: <input type="number" id="time-interval" value="2" style="width:44px">
         </div>
         
         <div class="flex items-center gap-2 border-r pr-2">
@@ -140,9 +159,10 @@
         <div id="typo-btns" class="flex gap-1 overflow-x-auto max-w-md"></div>
 
         <div class="ml-auto flex gap-2">
+            <button onclick="addActivity()" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold text-[9px] uppercase">Add Activity</button>
             <button onclick="addSection()" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold text-[9px] uppercase">Add Section</button>
             <button onclick="exportPNG()" class="px-2 py-1 bg-black text-white rounded font-bold text-[9px] uppercase">Export</button>
-            <button onclick="resetTool()" class="px-1 text-gray-400 hover:text-red-500 font-bold text-[9px]">Reset</button>
+            <button onclick="resetTool()" id="reset-btn" class="px-2 py-1 bg-red-500 text-white rounded font-bold text-[9px] uppercase">Reset</button>
         </div>
     </div>
 
@@ -168,10 +188,16 @@
             <div class="flex items-center justify-between gap-4">
                 <span class="text-[10px]">Font:</span>
                 <select id="font-family-input" class="text-[10px] border rounded">
-                    <option value="'Segoe UI', sans-serif">Sans</option>
-                    <option value="'Times New Roman', serif">Serif</option>
-                    <option value="'Courier New', monospace">Mono</option>
-                    <option value="Georgia, serif">Academic</option>
+                    <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                    <option value="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial">Inter / System</option>
+                    <option value="Roboto, 'Helvetica Neue', Arial, sans-serif">Roboto</option>
+                    <option value="'Open Sans', Arial, sans-serif">Open Sans</option>
+                    <option value="Lato, Arial, sans-serif">Lato</option>
+                    <option value="'Montserrat', Arial, sans-serif">Montserrat</option>
+                    <option value="'Times New Roman', serif">Times</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Courier New', monospace">Courier</option>
+                    <option value="monospace">Mono</option>
                 </select>
             </div>
         </div>
@@ -179,29 +205,75 @@
 
     <script>
         const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const colors = ['#ffffff', '#fcfcfc', '#f1f3f5', '#fff5f5', '#fff9db', '#f4fce3', '#e7f5ff', '#f3f0ff', '#ffc9c9', '#ffec99', '#b2f2bb', '#a5d8ff', '#d0bfff', '#fa5252', '#fab005', '#40c057', '#228be6', '#7950f2'];
+        const colors = [
+            // greys (white -> black)
+            '#ffffff','#f7f7f7','#efefef','#e7e7e7','#d0d0d0','#bdbdbd','#9e9e9e','#7f7f7f','#616161','#424242','#212121','#000000',
+            // light neutrals / pastels
+            '#fff8e1','#fff3bf','#fff1c0','#fff7f0','#f8f0ff','#f0f7ff','#eef9f3','#f3f0ff','#f9f4f6','#fff0f0','#fff5ed','#fffef6',
+            // blues
+            '#e7f5ff','#dbeafe','#e0f2fe','#cfe9ff','#dbe7ff','#cfe2ff','#bfe1ff','#b3d9ff','#8fc9ff','#66b3ff','#3e98ff','#1967d2',
+            // greens
+            '#e6fffa','#d1fbe8','#bff4d9','#aef0c8','#8decab','#6fd78f','#4fc56f','#2fb54f','#1aa34a','#0e8f3f','#067a35','#045b26',
+            // pinks/reds
+            '#fff0f0','#ffdce6','#ffc9d9','#ffb3c9','#ff9bb6','#ff7fa6','#ff5f8f','#ff3f76','#ff1f5c','#ff0550','#e60044','#b30036',
+            // yellows/oranges
+            '#fffbea','#fff5d6','#fff1c0','#ffeaa3','#ffe285','#ffd166','#ffc24a','#ffb21e','#ff9e00','#ff7a00','#e66a00','#b35400',
+            // purples
+            '#f8f0ff','#f3e8ff','#eadcff','#e1d0ff','#d7c4ff','#c9b1ff','#b89cff','#9f80ff','#8866ff','#6f48ff','#5a36e6','#3f22b3'
+        ];
         
         let state = {
-            startHour: 6, endHour: 22, rowDuration: 15, timeInterval: 4,
+            startHour: 6, endHour: 22, rowDuration: 30, timeInterval: 1,
             headerPos: 'top', direction: 'normal',
-            colColors: Array(9).fill('transparent'), 
+            colColors: Array(9).fill('transparent'),
+            // set weekend default colors (Sat=7, Sun=8)
+            // index mapping: 0 Time, 1 Notes, 2..8 weekdays Mon..Sun
+            colColorsWeekDefaults: null,
             cards: [], sections: [], activeTypo: null
         };
 
         function setupDefaults() {
+            // Apply weekend default colors if not already set
+            try {
+                state.colColors[7] = state.colColors[7] || '#fff4e6'; // Saturday light orange
+                state.colColors[8] = state.colColors[8] || '#ffd166'; // Sunday orange
+            } catch (e) {}
+
+            // compute rows per hour using current rowDuration
+            const rowsPerHour = Math.round(60 / state.rowDuration);
+            const morningStart = 0 + rowsPerHour * 1; // 1 hour after start
+            const dayStart = morningStart + rowsPerHour * 2; // morning length 2h
+            const workStart = dayStart; // day begins here
+            const workSpan = rowsPerHour * 8; // 8 hours
+            const schoolSpan = rowsPerHour * 6; // 6 hours
+            const eveningStart = workStart + workSpan + rowsPerHour * 1; // gap after work
+
             state.sections = [
-                { id: 1, row: 4, title: 'Morning' },
-                { id: 2, row: 12, title: 'Work Day' },
-                { id: 3, row: 44, title: 'Evening' }
+                { id: 1, row: morningStart, title: 'Morning' },
+                { id: 2, row: dayStart, title: 'Day' },
+                { id: 3, row: dayStart + workSpan, title: '' }, // titleless section 8 hours after Day
+                { id: 4, row: eveningStart, title: 'Evening' }
             ];
+
+            // default cards placed across the week (col:1..7). rows and span in rows
             state.cards = [
-                { id: 'c1', row: 6, col: 0, span: 4, title: 'Morning Jog', bullets: 'Park track\nHigh intensity', bgColor: '#e7f5ff', headerColor: '#a5d8ff' },
-                { id: 'c2', row: 42, col: 2, span: 6, title: 'Evening Gym', bullets: 'Squats\nBench press\nRows', bgColor: '#f3f0ff', headerColor: '#d0bfff' }
+                { id: 'c-ufo', row: morningStart, col: 1, span: rowsPerHour, title: 'UFO spotting', bullets: 'Look to the skies', bgColor: '#fff8e1', headerColor: '#fff3bf' },
+                { id: 'c-vamp', row: morningStart + rowsPerHour, col: 2, span: Math.max(1, rowsPerHour), title: 'Vampire hunting', bullets: 'Crucifix ready', bgColor: '#fff0f0', headerColor: '#ffdce6' },
+                { id: 'c-vill', row: dayStart, col: 3, span: Math.max(2, Math.floor(rowsPerHour*1.5)), title: 'Catching supervillains', bullets: 'Gadgets\nPlan route', bgColor: '#e7f5ff', headerColor: '#dbeafe' },
+                { id: 'c-pizza', row: dayStart + rowsPerHour*2, col: 4, span: rowsPerHour, title: 'Pizza', bullets: 'Order online', bgColor: '#fff4e6', headerColor: '#ffd7d7' },
+                { id: 'c-swim', row: dayStart, col: 5, span: rowsPerHour*2, title: 'Swimming', bullets: 'Pool laps', bgColor: '#e6fffa', headerColor: '#d1fbe8' },
+                { id: 'c-soccer', row: eveningStart, col: 6, span: rowsPerHour, title: 'Soccer', bullets: 'Team practice', bgColor: '#e0f2fe', headerColor: '#cfe9ff' },
+                { id: 'c-hockey', row: eveningStart, col: 7, span: rowsPerHour, title: 'Ice Hockey', bullets: 'Rink time', bgColor: '#f8f0ff', headerColor: '#f3e8ff' },
+                { id: 'c-skate', row: eveningStart, col: 1, span: rowsPerHour, title: 'Figure skating', bullets: 'Practice spins', bgColor: '#f3f0ff', headerColor: '#e7f5ff' },
+                { id: 'c-work', row: workStart, col: 2, span: workSpan, title: 'Work', bullets: '', bgColor: '#fff9db', headerColor: '#fff3bf' },
+                { id: 'c-school', row: workStart, col: 3, span: schoolSpan, title: 'School', bullets: '', bgColor: '#fffbea', headerColor: '#fff5d6' }
             ];
         }
 
         function init() {
-            setupDefaults();
+            // load saved state if present, otherwise setup defaults
+            const loaded = loadState();
+            if (!loaded || !state.cards || state.cards.length === 0) setupDefaults();
             createTypographyButtons();
             
             document.getElementById('start-hour').addEventListener('change', e => { state.startHour = parseInt(e.target.value); render(); });
@@ -222,12 +294,74 @@
                 render();
             };
 
-            window.onclick = () => {
-                document.querySelectorAll('.floating-menu').forEach(m => m.classList.remove('active'));
+            window.onclick = (e) => {
+                // hide floating menus only when clicking outside them
+                if (!e.target.closest('.floating-menu')) {
+                    document.querySelectorAll('.floating-menu').forEach(m => m.classList.remove('active'));
+                }
+                // If user was editing and clicked outside an input, end editing
+                if (state.editing && !e.target.closest('input') && !e.target.closest('[contenteditable]')) {
+                    state.editing = null;
+                }
+                // clear section selection unless a section-label was clicked
+                if (state.selectedSection && !e.target.closest('.section-label')) {
+                    state.selectedSection = null;
+                    render();
+                }
             };
             
+            // Render helper with adaptive debounce (exposed globally so render() handlers can call it)
+            window.scheduleRender = function() {
+                clearTimeout(window.renderTimer);
+                const delay = state.editing ? 700 : 150;
+                window.renderTimer = setTimeout(() => {
+                    // If editing was set, we still render after delay (gives time while typing). If editing cleared, render immediately on blur.
+                    render();
+                }, delay);
+            };
+
             render();
+            // Ensure measurements are correct after styles/fonts/layout settle.
+            // Re-render on next paint and after a short timeout to fix initial column width calculation.
+            requestAnimationFrame(() => render());
+            setTimeout(() => render(), 120);
         }
+
+        // Persistence: save/load state to localStorage so work isn't lost on refresh
+        function saveState() {
+            try {
+                const snapshot = {
+                    startHour: state.startHour, endHour: state.endHour, rowDuration: state.rowDuration, timeInterval: state.timeInterval,
+                    headerPos: state.headerPos, direction: state.direction, colColors: state.colColors, cards: state.cards, sections: state.sections,
+                    // save typography vars
+                    typography: {
+                        cardTitle: getComputedStyle(document.documentElement).getPropertyValue('--font-size-card-title'),
+                    }
+                };
+                localStorage.setItem('regime_state_v1', JSON.stringify(snapshot));
+            } catch (e) { console.warn('save failed', e); }
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem('regime_state_v1');
+                if (!raw) return false;
+                const s = JSON.parse(raw);
+                state.startHour = s.startHour ?? state.startHour;
+                state.endHour = s.endHour ?? state.endHour;
+                state.rowDuration = s.rowDuration ?? state.rowDuration;
+                state.timeInterval = s.timeInterval ?? state.timeInterval;
+                state.headerPos = s.headerPos ?? state.headerPos;
+                state.direction = s.direction ?? state.direction;
+                state.colColors = s.colColors ?? state.colColors;
+                state.cards = s.cards ?? state.cards;
+                state.sections = s.sections ?? state.sections;
+                return true;
+            } catch (e) { console.warn('load failed', e); return false; }
+        }
+
+        function clearState() { localStorage.removeItem('regime_state_v1'); }
+
 
         function createTypographyButtons() {
             const container = document.getElementById('typo-btns');
@@ -249,12 +383,61 @@
                     const menu = document.getElementById('typo-menu');
                     document.getElementById('typo-menu-title').innerText = t.label;
                     document.getElementById('font-size-input').value = parseInt(getComputedStyle(document.documentElement).getPropertyValue(`--font-size-${t.id}`));
+                    try { document.getElementById('font-family-input').value = getComputedStyle(document.documentElement).getPropertyValue(`--font-family-${t.id}`); } catch(e) {}
                     menu.style.left = e.clientX + 'px';
                     menu.style.top = (e.clientY + 20) + 'px';
                     menu.classList.add('active');
+                    populateTypoColorGrid();
                 };
                 container.appendChild(btn);
             });
+        }
+
+        function getCaretCharacterOffsetWithin(element) {
+            var caretOffset = 0;
+            var sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                var range = sel.getRangeAt(0);
+                var preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(element);
+                preCaretRange.setEnd(range.endContainer, range.endOffset);
+                caretOffset = preCaretRange.toString().length;
+            }
+            return caretOffset;
+        }
+
+        function setCaretCharacterOffsetWithin(element, chars) {
+            if (chars < 0) return;
+            var nodeStack = [element], node, found=false, charCount=0;
+            var range = document.createRange();
+            var sel = window.getSelection();
+            while(nodeStack.length && !found){
+                node = nodeStack.shift();
+                if(node.nodeType === 3){
+                    var nextCharCount = charCount + node.length;
+                    if(nextCharCount >= chars){
+                        range.setStart(node, chars - charCount);
+                        range.collapse(true);
+                        found = true;
+                        break;
+                    } else {
+                        charCount = nextCharCount;
+                    }
+                } else {
+                    for(var i=0;i<node.childNodes.length;i++) nodeStack.push(node.childNodes[i]);
+                }
+            }
+            if(found){
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+
+        // Helper: toggle empty class for contenteditable that may contain <br> or whitespace
+        function updateEditableEmpty(el) {
+            if (!el) return;
+            const txt = el.innerText || '';
+            if (txt.trim().length === 0) el.classList.add('empty'); else el.classList.remove('empty');
         }
 
         function render() {
@@ -264,16 +447,28 @@
             grid.innerHTML = '';
 
             // 1. DYNAMIC COMPACT ROW HEIGHTS
-            const minH = 14; 
+            // compute adaptive default row height so the grid vertical size stays consistent across different time ranges
+            const container = document.getElementById('capture-area');
+            const availH = (container && container.clientHeight) ? container.clientHeight : window.innerHeight;
+            const reservedSpace = 140; // header + paddings and some breathing room
+            // base per-row height from available space
+            let computedMinH = Math.max(12, Math.floor((availH - reservedSpace) / Math.max(1, rowCount)));
+            // clamp to a reasonable range, and prefer larger rows when there are few rows (coarse rowDuration)
+            computedMinH = Math.min(64, Math.max(14, computedMinH));
+            if (rowCount <= 24) computedMinH = Math.max(computedMinH, 24);
+            const minH = computedMinH;
             const rowHeights = new Array(rowCount).fill(minH);
             const measurer = document.getElementById('measurer');
             
+            // measure card body heights (use pre-wrap for multiline height)
+            measurer.style.whiteSpace = 'pre-wrap';
+            measurer.style.wordWrap = 'break-word';
             state.cards.forEach(card => {
                 measurer.style.fontFamily = getComputedStyle(document.documentElement).getPropertyValue('--font-family-bullets');
                 measurer.style.fontSize = getComputedStyle(document.documentElement).getPropertyValue('--font-size-bullets');
                 measurer.innerText = card.bullets || ' ';
                 const bodyH = measurer.offsetHeight;
-                const headerH = 26;
+                const headerH = 18;
                 const totalReq = bodyH + headerH + 8;
                 const perRow = Math.ceil(totalReq / card.span);
                 for(let r = card.row; r < card.row + card.span; r++) {
@@ -282,17 +477,69 @@
             });
             grid.style.gridTemplateRows = `auto ${rowHeights.map(h => h + 'px').join(' ')} auto`;
 
+            // 1b. DYNAMIC COLUMN WIDTHS: compute minimum widths per weekday column
+            const timeColW = 50;
+            const notesColW = 100;
+            const dayCols = new Array(7).fill(60); // default narrower for blank columns
+            // switch measurer to single-line mode for width measurement
+            measurer.style.whiteSpace = 'nowrap';
+            state.cards.forEach(card => {
+                if(!card.col || card.col < 1 || card.col > 7) return;
+                measurer.style.fontFamily = getComputedStyle(document.documentElement).getPropertyValue('--font-family-card-title');
+                measurer.style.fontSize = getComputedStyle(document.documentElement).getPropertyValue('--font-size-card-title');
+                measurer.innerText = card.title || '';
+                const titleW = measurer.offsetWidth || 0;
+
+                measurer.style.fontFamily = getComputedStyle(document.documentElement).getPropertyValue('--font-family-bullets');
+                measurer.style.fontSize = getComputedStyle(document.documentElement).getPropertyValue('--font-size-bullets');
+                const lines = (card.bullets || '').split('\n');
+                let bulletsW = 0;
+                lines.forEach(l => { measurer.innerText = l || ''; bulletsW = Math.max(bulletsW, measurer.offsetWidth || 0); });
+
+                const desired = Math.min(420, Math.max(60, Math.max(titleW + 80, bulletsW + 40)));
+                dayCols[card.col - 1] = Math.max(dayCols[card.col - 1], desired);
+            });
+            // restore measurer to pre-wrap for future height measures
+            measurer.style.whiteSpace = 'pre-wrap';
+
+            // compute final pixel widths so layout is deterministic on initial load
+            const gridRect = grid.getBoundingClientRect();
+            const available = Math.max(200, gridRect.width - timeColW - notesColW);
+            const sumMin = dayCols.reduce((s,v) => s+v, 0);
+            let finalDayWidths = new Array(7).fill(60);
+            const defaultMin = 60;
+            if (sumMin <= available) {
+                const extra = available - sumMin;
+                const weights = dayCols.map(w => w > defaultMin ? 2 : 1);
+                const totalWeight = weights.reduce((s,w)=>s+w,0);
+                finalDayWidths = dayCols.map((v,i) => Math.round(v + extra * (weights[i]/totalWeight)));
+            } else {
+                // scale down proportionally to fit
+                const scale = available / sumMin;
+                finalDayWidths = dayCols.map(v => Math.max(40, Math.round(v * scale)));
+            }
+            const dayTemplate = finalDayWidths.map(w => `${w}px`).join(' ');
+            grid.style.gridTemplateColumns = `${timeColW}px ${notesColW}px ${dayTemplate}`;
+
             // 2. Header
             const headerRowY = state.headerPos === 'top' ? 1 : rowCount + 2;
             const colNames = ['Time', 'Notes', ...weekdays];
             colNames.forEach((name, i) => {
                 const div = document.createElement('div');
-                div.className = 'header-cell';
+                    div.className = 'header-cell';
                 div.textContent = name;
                 div.style.gridColumn = i + 1;
                 div.style.gridRow = headerRowY;
-                div.onclick = (e) => showPalette(e, (c) => { state.colColors[i] = c; render(); });
+                // open a column palette that allows setting background and text color
+                div.onclick = (e) => { e.stopPropagation(); const rect = div.getBoundingClientRect(); showPaletteAt(rect, (c) => { state.colColors[i] = c; 
+                    // ensure time column text remains readable when changing its background
+                    if (i === 0) {
+                        const textColor = pickTextColorForBg(c);
+                        document.documentElement.style.setProperty('--font-color-time-col', textColor);
+                    }
+                    render(); }); };
                 div.style.backgroundColor = state.colColors[i];
+                div.style.color = state.colTextColors && state.colTextColors[i] ? state.colTextColors[i] : '';
                 grid.appendChild(div);
             });
 
@@ -315,7 +562,8 @@
                         slot.style.fontSize = 'var(--font-size-time-col)';
                         slot.style.fontFamily = 'var(--font-family-time-col)';
                         if (logicRow % state.timeInterval === 0) slot.textContent = formatTime(state.startHour, logicRow * state.rowDuration);
-                    } else {
+                    } else if (c >= 2) {
+                        // only allow creating cards in actual day columns (c >= 2). Prevent notes column (c === 1)
                         slot.ondblclick = () => {
                             state.cards.push({ id: Date.now(), row: logicRow, col: c - 1, span: 4, title: 'Activity', bullets: 'Bullet points...', bgColor: '#ffffff', headerColor: '#f8f9fa' });
                             render();
@@ -332,11 +580,14 @@
 
                 const cardEl = document.createElement('div');
                 cardEl.className = 'activity-card';
+                // ensure column index is within weekday bounds (1..7). If invalid, clamp to 1 (MON)
+                cardObj.col = Math.max(1, Math.min(7, cardObj.col || 1));
                 cardEl.style.setProperty('--col-start', cardObj.col + 2);
                 cardEl.style.setProperty('--row-start', gridY);
                 cardEl.style.setProperty('--row-span', cardObj.span);
                 cardEl.style.backgroundColor = cardObj.bgColor;
 
+                cardEl.dataset.cardId = cardObj.id;
                 cardEl.innerHTML = `
                     <div class="drag-bar"></div>
                     <div class="resize-handle-top"></div>
@@ -346,7 +597,7 @@
                             <span>${formatTime(state.startHour, (cardObj.row + cardObj.span) * state.rowDuration)}</span>
                         </div>
                         <div class="card-title" contenteditable="true" spellcheck="false">${cardObj.title}</div>
-                        <div class="flex flex-col gap-1 no-export">
+                        <div class="flex flex-row gap-1 no-export items-center">
                             <div class="color-picker-box bg-btn" style="background:${cardObj.bgColor}"></div>
                             <div class="color-picker-box header-btn" style="background:${cardObj.headerColor}"></div>
                         </div>
@@ -359,49 +610,110 @@
 
                 const bulletList = cardEl.querySelector('.bullet-list');
                 const cardTitle = cardEl.querySelector('.card-title');
+                // mark empty state so placeholder only shows when really empty (contenteditable may contain <br>)
+                updateEditableEmpty(bulletList);
 
                 cardEl.querySelector('.bg-btn').onclick = (e) => showPalette(e, c => { cardObj.bgColor = c; render(); });
                 cardEl.querySelector('.header-btn').onclick = (e) => showPalette(e, c => { cardObj.headerColor = c; render(); });
                 
-                cardTitle.onblur = e => { cardObj.title = e.target.innerText; render(); };
-                bulletList.oninput = () => { cardObj.bullets = bulletList.innerText; clearTimeout(window.renderTimer); window.renderTimer = setTimeout(render, 150); };
+                // title editing: preserve caret and debounce render
+                cardTitle.oninput = (e) => {
+                    cardObj.title = e.target.innerText;
+                    state.editing = { id: cardObj.id, field: 'title', offset: getCaretCharacterOffsetWithin(e.target) };
+                    state.selectedCard = cardObj.id; // mark card as selected while editing
+                    clearTimeout(window.renderTimer);
+                    scheduleRender();
+                };
+                cardTitle.onblur = e => { cardObj.title = e.target.innerText; state.editing = null; render(); };
 
-                // DRAG AND DROP LOGIC
+                // bullets editing: preserve caret and debounce render
+                bulletList.oninput = (e) => {
+                    cardObj.bullets = bulletList.innerText;
+                    state.editing = { id: cardObj.id, field: 'bullets', offset: getCaretCharacterOffsetWithin(e.target) };
+                    state.selectedCard = cardObj.id;
+                    updateEditableEmpty(bulletList);
+                    clearTimeout(window.renderTimer);
+                    scheduleRender();
+                };
+                bulletList.onkeydown = (e) => {
+                    // on Enter, allow immediate update so newlines render quickly
+                    if (e.key === 'Enter') {
+                        setTimeout(() => { render(); }, 50);
+                    }
+                };
+                bulletList.onblur = () => { state.editing = null; render(); };
+
+                // clicking anywhere in the card selects it
+                cardEl.onclick = (ev) => { ev.stopPropagation(); state.selectedCard = cardObj.id; cardEl.classList.add('card-selected'); };
+
+                // apply selected visual
+                if (state.selectedCard === cardObj.id) cardEl.classList.add('card-selected'); else cardEl.classList.remove('card-selected');
+
+                // DRAG AND DROP LOGIC - use floating ghost to minimize reflows
                 const dragBar = cardEl.querySelector('.drag-bar');
                 dragBar.onmousedown = (e) => {
                     e.preventDefault();
-                    cardEl.style.zIndex = '1000';
-                    cardEl.style.opacity = '0.5';
-                    
+                    const grid = document.getElementById('main-grid');
+                    const gridRect = grid.getBoundingClientRect();
+
+                    // create ghost copy and set explicit pixel size to avoid flexible/auto heights
+                    const ghost = cardEl.cloneNode(true);
+                    const cardRect = cardEl.getBoundingClientRect();
+                    ghost.style.position = 'fixed';
+                    // position the ghost at the current card position immediately so it is visible before first mousemove
+                    ghost.style.left = cardRect.left + 'px';
+                    ghost.style.top = cardRect.top + 'px';
+                    ghost.style.pointerEvents = 'none';
+                    ghost.style.opacity = '0.95';
+                    ghost.style.zIndex = '2000';
+                    ghost.style.width = cardRect.width + 'px';
+                    ghost.style.height = cardRect.height + 'px';
+                    ghost.style.boxSizing = 'border-box';
+                    ghost.style.overflow = 'hidden';
+                    // remove any grid-based CSS vars that could affect cloned layout
+                    ghost.style.removeProperty('--col-start');
+                    ghost.style.removeProperty('--row-start');
+                    ghost.style.removeProperty('--row-span');
+                    document.body.appendChild(ghost);
+                    cardEl.style.visibility = 'hidden';
+
+                    let pendingRow = cardObj.row;
+                    let pendingCol = cardObj.col;
+
                     const onMouseMove = (moveEvent) => {
                         const target = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
                         const slot = target?.closest('.slot');
+
                         if (slot) {
                             const tr = parseInt(slot.dataset.row);
-                            const tc = parseInt(slot.dataset.col);
-                            
-                            // Align correctly based on table direction
-                            let targetRow = tr;
-                            if (state.direction === 'reverse') {
-                                targetRow = tr; // logicRow is already handled in slot.dataset.row
-                            }
+                            let tc = parseInt(slot.dataset.col);
 
-                            // Keep in bounds
-                            targetRow = Math.max(0, Math.min(targetRow, rowCount - cardObj.span));
-                            
-                            if (cardObj.row !== targetRow || cardObj.col !== tc) {
-                                cardObj.row = targetRow;
-                                cardObj.col = tc;
-                                render();
-                            }
+                            // Prevent dropping into notes (col <= 0)
+                            if (isNaN(tc) || tc <= 0) tc = 1;
+                            tc = Math.max(1, Math.min(tc, 7));
+
+                            const targetRow = Math.max(0, Math.min(tr, rowCount - cardObj.span));
+
+                            pendingRow = targetRow;
+                            pendingCol = tc;
+
+                            const slotRect = slot.getBoundingClientRect();
+                            ghost.style.left = (slotRect.left + 4) + 'px';
+                            ghost.style.top = (slotRect.top + 2) + 'px';
+                            ghost.style.width = Math.max(80, (slotRect.width - 8)) + 'px';
                         }
                     };
 
-                    const onMouseUp = () => {
+                    const onMouseUp = (upEvent) => {
                         window.removeEventListener('mousemove', onMouseMove);
                         window.removeEventListener('mouseup', onMouseUp);
-                        cardEl.style.zIndex = '20';
-                        cardEl.style.opacity = '1';
+
+                        // commit
+                        cardObj.row = pendingRow;
+                        cardObj.col = pendingCol;
+
+                        ghost.remove();
+                        cardEl.style.visibility = '';
                         render();
                     };
 
@@ -418,7 +730,7 @@
                         const startRow = cardObj.row;
                         const startSpan = cardObj.span;
                         const move = me => {
-                            const diff = Math.round((me.clientY - startY) / 14);
+                            const diff = Math.round((me.clientY - startY) / Math.max(8, minH));
                             if (isTop) {
                                 const newRow = Math.max(0, Math.min(startRow + diff, startRow + startSpan - 1));
                                 cardObj.span = startSpan + (startRow - newRow);
@@ -434,6 +746,22 @@
                 });
 
                 grid.appendChild(cardEl);
+
+                // Restore editing caret/focus if the user was typing in this card
+                if (state.editing && state.editing.id === cardObj.id) {
+                    try {
+                        const f = state.editing.field;
+                        const off = state.editing.offset || 0;
+                        let targetEl = null;
+                        if (f === 'bullets') targetEl = cardEl.querySelector('.bullet-list');
+                        else if (f === 'title') targetEl = cardEl.querySelector('.card-title');
+                        if (targetEl) {
+                            targetEl.focus();
+                            // set caret at offset
+                            setCaretCharacterOffsetWithin(targetEl, off);
+                        }
+                    } catch (e) { /* ignore restore errors */ }
+                }
             });
 
             // 5. Section Dividers
@@ -444,37 +772,129 @@
                 const secEl = document.createElement('div');
                 secEl.className = 'section-break';
                 secEl.style.setProperty('--row-start', gridY);
+                // render section: line + label
                 secEl.innerHTML = `
-                    <div class="section-label">
+                    <div class="section-line"></div>
+                    <div class="section-label ${sec.title.trim() === '' ? 'section-empty' : ''}">
                         <input class="section-input" value="${sec.title}" spellcheck="false">
                         <span class="section-delete no-export">×</span>
                     </div>
                 `;
                 
-                const input = secEl.querySelector('input');
-                input.onblur = e => { sec.title = e.target.value; render(); };
-                input.oninput = e => e.target.style.width = (e.target.value.length + 0.5) + 'ch';
+                const input = secEl.querySelector('.section-input');
+                // prevent clicks inside input from clearing selection
+                input.onclick = (e) => { e.stopPropagation(); state.selectedSection = sec.id; /* avoid re-render to keep focus */ };
+                input.onfocus = (e) => { state.selectedSection = sec.id; /* avoid re-render to keep focus */ };
+                input.onblur = e => { sec.title = e.target.value; state.editing = null; render(); };
+                input.oninput = e => {
+                    e.target.style.width = (e.target.value.length + 0.5) + 'ch';
+                    // update class for empty
+                    const lbl = secEl.querySelector('.section-label');
+                    if (e.target.value.trim() === '') lbl.classList.add('section-empty'); else lbl.classList.remove('section-empty');
+                    sec.title = e.target.value;
+                    // preserve editing caret state for restoration after render
+                    state.editing = { id: sec.id, field: 'section', offset: e.target.selectionStart };
+                    // Do NOT re-render while typing in section input. Render on blur to avoid stealing caret/focus.
+                };
                 input.style.width = (sec.title.length + 0.5) + 'ch';
 
-                secEl.querySelector('.section-delete').onclick = () => { state.sections.splice(idx,1); render(); };
+                const deleteBtn = secEl.querySelector('.section-delete');
+                deleteBtn.onclick = (ev) => { ev.stopPropagation(); state.sections.splice(idx,1); render(); };
 
-                secEl.querySelector('.section-label').onmousedown = e => {
-                    if (e.target.tagName === 'INPUT' || e.target.className === 'section-delete') return;
-                    const move = me => {
-                        const target = document.elementFromPoint(me.clientX, me.clientY)?.closest('.cell');
-                        if (target) {
-                            const gy = parseInt(target.style.gridRowStart || target.style.gridRow);
-                            const lr = state.headerPos === 'top' ? gy - 2 : gy - 1;
-                            sec.row = state.direction === 'normal' ? lr : (rowCount - lr);
-                            render();
-                        }
+                const label = secEl.querySelector('.section-label');
+                label.onclick = (ev) => { ev.stopPropagation(); state.selectedSection = sec.id; render(); };
+
+                // show delete only when selected
+                if (state.selectedSection === sec.id) {
+                    label.classList.add('selected');
+                } else {
+                    label.classList.remove('selected');
+                }
+
+                label.onmousedown = e => {
+                    if (e.target.tagName === 'INPUT' || e.target.classList.contains('section-delete')) return;
+                    e.preventDefault();
+
+                    // mark as selected during drag
+                    state.selectedSection = sec.id; label.classList.add('selected');
+
+                    const grid = document.getElementById('main-grid');
+                    const gridRect = grid.getBoundingClientRect();
+
+                    // create a visible ghost line for feedback
+                    const line = document.createElement('div');
+                    line.style.position = 'fixed';
+                    line.style.left = (gridRect.left + 2) + 'px';
+                    line.style.width = (gridRect.width - 4) + 'px';
+                    line.style.height = '2px';
+                    line.style.background = 'rgba(0,0,0,0.6)';
+                    line.style.zIndex = 2000;
+                    document.body.appendChild(line);
+
+                    // compute cumulative pixel offsets for data rows
+                    const cumulative = [0];
+                    for (let i = 0; i < rowHeights.length; i++) cumulative[i+1] = cumulative[i] + rowHeights[i];
+
+                    // find top offset of the first data row relative to gridRect.top (accounts for header auto row)
+                    let dataStartTop = 0;
+                    try {
+                        const firstSlot = grid.querySelector('.cell[data-row="0"]');
+                        if (firstSlot) dataStartTop = firstSlot.getBoundingClientRect().top - gridRect.top;
+                    } catch (e) { dataStartTop = 0; }
+
+                    let rafId = null;
+                    const onMove = me => {
+                        if (rafId) cancelAnimationFrame(rafId);
+                        rafId = requestAnimationFrame(() => {
+                            // y within the data rows area
+                            const y = me.clientY - gridRect.top - dataStartTop;
+                            let r = rowHeights.length - 1;
+                            for (let i = 0; i < rowHeights.length; i++) {
+                                if (y >= cumulative[i] && y < cumulative[i+1]) { r = i; break; }
+                            }
+
+                            const lineTop = gridRect.top + dataStartTop + cumulative[r];
+                            line.style.top = (lineTop - 1) + 'px';
+
+                            const lr = r;
+                            const newRow = state.direction === 'normal' ? lr : (rowCount - lr);
+                            sec.row = Math.max(0, Math.min(newRow, rowCount));
+                        });
                     };
-                    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
-                    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+
+                    const onUp = () => {
+                        window.removeEventListener('mousemove', onMove);
+                        window.removeEventListener('mouseup', onUp);
+                        if (rafId) cancelAnimationFrame(rafId);
+                        line.remove();
+                        render();
+                    };
+
+                    window.addEventListener('mousemove', onMove);
+                    window.addEventListener('mouseup', onUp);
                 };
                 grid.appendChild(secEl);
             });
+
+            // restore editing caret for section if needed
+            if (state.editing && state.editing.field === 'section') {
+                const sec = state.sections.find(s => s.id === state.editing.id);
+                if (sec) {
+                    // find the first input that matches this section title (best-effort)
+                    const inputs = Array.from(document.querySelectorAll('.section-input'));
+                    let input = inputs.find(i => i && i.value === sec.title);
+                    if (!input) input = inputs[0];
+                    if (input) {
+                        input.focus();
+                        try {
+                            const off = state.editing.offset || (input.value ? input.value.length : 0);
+                            input.setSelectionRange(off, off);
+                        } catch (e) { /* ignore */ }
+                    }
+                }
+            }
         }
+        try { saveState(); } catch(e) {}
 
         function showPalette(e, onSelect) {
             e.stopPropagation();
@@ -484,12 +904,78 @@
             colors.forEach(c => {
                 const s = document.createElement('div');
                 s.className = 'swatch'; s.style.backgroundColor = c;
-                s.onclick = (e) => { e.stopPropagation(); onSelect(c); menu.classList.remove('active'); };
+                s.onclick = (ev) => { ev.stopPropagation(); onSelect(c); menu.classList.remove('active'); };
                 grid.appendChild(s);
             });
             menu.style.left = Math.min(e.clientX, window.innerWidth - 160) + 'px';
             menu.style.top = Math.min(e.clientY, window.innerHeight - 150) + 'px';
             menu.classList.add('active');
+        }
+
+        function showPaletteAt(rect, onSelect) {
+            const menu = document.getElementById('global-palette');
+            const grid = document.getElementById('palette-grid');
+            grid.innerHTML = '';
+            colors.forEach(c => {
+                const s = document.createElement('div');
+                s.className = 'swatch'; s.style.backgroundColor = c;
+                s.onclick = (ev) => { ev.stopPropagation(); onSelect(c); menu.classList.remove('active'); };
+                grid.appendChild(s);
+            });
+            // position under the rect, but clamp to viewport
+            const left = Math.max(8, Math.min(rect.left, window.innerWidth - 160));
+            const top = Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - 150));
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            menu.classList.add('active');
+        }
+
+        function luminance(hex) {
+            // hex -> luminance 0..1
+            if (!hex) return 1;
+            const c = hex.replace('#','');
+            const r = parseInt(c.substring(0,2),16)/255;
+            const g = parseInt(c.substring(2,4),16)/255;
+            const b = parseInt(c.substring(4,6),16)/255;
+            const a = [r,g,b].map(v => v <= 0.03928 ? v/12.92 : Math.pow(((v+0.055)/1.055),2.4));
+            return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
+        }
+
+        function pickTextColorForBg(bgHex) {
+            const L = luminance(bgHex);
+            // return dark for light backgrounds, white for dark backgrounds
+            return L > 0.5 ? '#111111' : '#ffffff';
+        }
+
+        // specialized palette for column background/text color
+        function showColumnPalette(e, colIndex) { e.stopPropagation(); showPalette(e, (c) => { state.colColors[colIndex] = c; render(); }); }
+
+        function populateTypoColorGrid() {
+            const menu = document.getElementById('typo-menu');
+            if (!menu) return;
+            let grid = document.getElementById('typo-color-grid');
+            if (!grid) {
+                // create grid inside the menu if the HTML didn't include it
+                const container = document.createElement('div');
+                container.className = 'mt-2';
+                container.innerHTML = '<div class="text-[10px] font-bold text-gray-400 mb-1">Color</div><div id="typo-color-grid" class="menu-grid"></div>';
+                menu.querySelector('.flex')?.appendChild(container);
+                grid = document.getElementById('typo-color-grid');
+            }
+            grid.innerHTML = '';
+            colors.forEach(c => {
+                const s = document.createElement('div');
+                s.className = 'swatch'; s.style.backgroundColor = c;
+                s.onclick = (ev) => {
+                    ev.stopPropagation();
+                    if (!state.activeTypo) return;
+                    document.documentElement.style.setProperty(`--font-color-${state.activeTypo}`, c);
+                    // also update any explicit state if needed
+                    menu.classList.remove('active');
+                    render();
+                };
+                grid.appendChild(s);
+            });
         }
 
         function formatTime(startH, elapsed) {
@@ -500,11 +986,72 @@
         }
 
         function addSection() { state.sections.push({ id: Date.now(), row: 10, title: 'NEW SECTION' }); render(); }
-        function resetTool() { if(confirm("Reset?")) { state.colColors = Array(9).fill('transparent'); state.cards = []; state.sections = []; setupDefaults(); render(); } }
+        function addActivity() {
+            const totalMins = (state.endHour - state.startHour) * 60;
+            const rowCount = Math.ceil(totalMins / state.rowDuration);
+            const defaultRow = Math.min(4, Math.max(0, Math.floor(rowCount / 8)));
+            // default to first weekday column (card.col = 1 corresponds to MON)
+            state.cards.push({ id: Date.now().toString(), row: defaultRow, col: 1, span: 4, title: 'New Activity', bullets: 'Point 1', bgColor: '#ffffff', headerColor: '#f8f9fa' });
+            render();
+        }
+        function resetTool() { if(confirm("Reset to defaults? This will remove your saved regime.")) { clearState(); state.colColors = Array(9).fill('transparent'); state.cards = []; state.sections = []; setupDefaults(); render(); } }
         async function exportPNG() {
             const area = document.getElementById('capture-area');
-            const canvas = await html2canvas(area, { scale: 3, backgroundColor: '#ffffff' });
+            // hide floating menus before snapshot
+            document.querySelectorAll('.floating-menu').forEach(m => m.classList.remove('active'));
+
+            // wait for fonts to be ready so measurements and rendering match on-screen
+            if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+            const rect = area.getBoundingClientRect();
+            const clone = area.cloneNode(true);
+            clone.querySelectorAll('.no-export').forEach(n => n.remove());
+
+            // wrapper offscreen
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = '-9999px';
+            wrapper.style.top = '0px';
+            wrapper.style.width = rect.width + 'px';
+            wrapper.style.height = rect.height + 'px';
+            wrapper.style.overflow = 'hidden';
+            wrapper.style.background = '#ffffff';
+            wrapper.appendChild(clone);
+            document.body.appendChild(wrapper);
+
+            // copy computed styles from source to clone for fidelity
+            try {
+                const srcEls = Array.from(area.querySelectorAll('*'));
+                const dstEls = Array.from(clone.querySelectorAll('*'));
+                // include root nodes
+                srcEls.unshift(area);
+                dstEls.unshift(clone);
+                for (let i = 0; i < srcEls.length && i < dstEls.length; i++) {
+                    const s = window.getComputedStyle(srcEls[i]);
+                    const dest = dstEls[i];
+                    // copy all computed properties
+                    for (let j = 0; j < s.length; j++) {
+                        const prop = s[j];
+                        try { dest.style.setProperty(prop, s.getPropertyValue(prop), s.getPropertyPriority(prop)); } catch (e) { /* ignore invalid props */ }
+                    }
+                    // neutralize sticky/fixed and transforms
+                    if (s.position === 'fixed' || s.position === 'sticky') dest.style.position = 'static';
+                    dest.style.transform = 'none';
+                }
+            } catch (e) {
+                // if copying styles fails, continue — clone will still be used
+                console.warn('style copy failed', e);
+            }
+
+            // Wait a tick to allow the clone to layout with copied styles
+            await new Promise(r => requestAnimationFrame(r));
+            await new Promise(r => setTimeout(r, 40));
+
+            // render clone with explicit width/height
+            const canvas = await html2canvas(clone, { scale: 3, backgroundColor: '#ffffff', width: rect.width, height: rect.height });
             const link = document.createElement('a'); link.download = 'regime.png'; link.href = canvas.toDataURL(); link.click();
+
+            wrapper.remove();
         }
 
         window.onload = init;
